@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Viens Manger</title>
+</head>
+<body>
+    <h1>🍽️ Viens Manger Recipes</h1>
+
+    {% for recipe in recipes %}
+        <div style="border:1px solid black; padding:10px; margin:10px;">
+            <h2>{{ recipe.title }}</h2>
+            <p><strong>Description:</strong> {{ recipe.description }}</p>
+            <p><strong>Ingredients:</strong> {{ recipe.ingredients }}</p>
+            <p><strong>Instructions:</strong> {{ recipe.instructions }}</p>
+        </div>
+    {% endfor %}
+
+</body>
+</html>
