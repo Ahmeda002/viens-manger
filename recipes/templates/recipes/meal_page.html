@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ page_title }}</h1>
+
+    <h2>Your Recipes</h2>
+    {% if recipes %}
+        <ul>
+            {% for recipe in recipes %}
+                <li>
+                    <strong>{{ recipe.title }}</strong><br>
+                    {{ recipe.description }}<br>
+                    <strong>Ingredients:</strong> {{ recipe.ingredients }}<br>
+                    <strong>Instructions:</strong> {{ recipe.instructions }}
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No recipes added for this category yet.</p>
+    {% endif %}
+
+    <h2>API Recipes</h2>
+    {% if meals %}
+        <div class="row">
+            {% for meal in meals %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ meal.strMealThumb }}" class="card-img-top" alt="{{ meal.strMeal }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ meal.strMeal }}</h5>
+
+                            <p class="card-text">
+                                <strong>Category:</strong> {{ meal.strCategory }}<br>
+                                <strong>Area:</strong> {{ meal.strArea }}
+                            </p>
+
+                            <p class="card-text">
+                                {{ meal.strInstructions|truncatewords:20 }}
+                            </p>
+
+                            <form method="POST" action="{% url 'save_api_recipe' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="title" value="{{ meal.strMeal }}">
+                                <input type="hidden" name="description" value="{{ meal.strCategory }} - {{ meal.strArea }}">
+                                <input type="hidden" name="instructions" value="{{ meal.strInstructions }}">
+                                <input type="hidden" name="category" value="{{ category }}">
+
+                                <input type="hidden" name="ingredient1" value="{{ meal.strIngredient1 }}">
+                                <input type="hidden" name="ingredient2" value="{{ meal.strIngredient2 }}">
+                                <input type="hidden" name="ingredient3" value="{{ meal.strIngredient3 }}">
+                                <input type="hidden" name="ingredient4" value="{{ meal.strIngredient4 }}">
+                                <input type="hidden" name="ingredient5" value="{{ meal.strIngredient5 }}">
+                                <input type="hidden" name="ingredient6" value="{{ meal.strIngredient6 }}">
+                                <input type="hidden" name="ingredient7" value="{{ meal.strIngredient7 }}">
+                                <input type="hidden" name="ingredient8" value="{{ meal.strIngredient8 }}">
+                                <input type="hidden" name="ingredient9" value="{{ meal.strIngredient9 }}">
+                                <input type="hidden" name="ingredient10" value="{{ meal.strIngredient10 }}">
+
+                                <input type="hidden" name="measure1" value="{{ meal.strMeasure1 }}">
+                                <input type="hidden" name="measure2" value="{{ meal.strMeasure2 }}">
+                                <input type="hidden" name="measure3" value="{{ meal.strMeasure3 }}">
+                                <input type="hidden" name="measure4" value="{{ meal.strMeasure4 }}">
+                                <input type="hidden" name="measure5" value="{{ meal.strMeasure5 }}">
+                                <input type="hidden" name="measure6" value="{{ meal.strMeasure6 }}">
+                                <input type="hidden" name="measure7" value="{{ meal.strMeasure7 }}">
+                                <input type="hidden" name="measure8" value="{{ meal.strMeasure8 }}">
+                                <input type="hidden" name="measure9" value="{{ meal.strMeasure9 }}">
+                                <input type="hidden" name="measure10" value="{{ meal.strMeasure10 }}">
+
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Save Recipe
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No API recipes found.</p>
+    {% endif %}
+{% endblock %}

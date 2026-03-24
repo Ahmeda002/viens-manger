@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>All Recipes</h1>
+
+{% if recipes %}
+    <ul>
+        {% for recipe in recipes %}
+            <li>
+                <strong>{{ recipe.title }}</strong><br>
+                <p>{{ recipe.description }}</p>
+                <p><strong>Ingredients:</strong> {{ recipe.ingredients }}</p>
+                <p><strong>Instructions:</strong> {{ recipe.instructions }}</p>
+                <p><strong>Category:</strong> {{ recipe.category }}</p>
+
+                <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-warning btn-sm">Edit</a>
+
+                <a href="{% url 'delete_recipe' recipe.id %}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Are you sure you want to delete this recipe?');">
+                   Delete
+                </a>
+            </li>
+            <hr>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No recipes found.</p>
+{% endif %}
+{% endblock %}

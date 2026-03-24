@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h2 class="mb-0">Edit Recipe</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+
+                    {% if recipe.image %}
+                        <div class="mb-3">
+                            <p class="mb-2"><strong>Current Image:</strong></p>
+                            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" width="250" class="img-fluid rounded">
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-warning">Update Recipe</button>
+                    <a href="{% url 'recipes' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

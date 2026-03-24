@@ -1,6 +1,19 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-    <h1>Recipes Page</h1>
-    <p>Here are the recipes.</p>
+<h2>All Recipes</h2>
+
+{% if recipes %}
+    <ul>
+        {% for recipe in recipes %}
+            <li>
+                <strong>{{ recipe.title }}</strong><br>
+                {{ recipe.description }}
+            </li>
+            <hr>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No recipes yet.</p>
+{% endif %}
 {% endblock %}

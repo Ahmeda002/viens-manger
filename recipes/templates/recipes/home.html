@@ -1,6 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Home Page</h1>
-    <p>Welcome to the recipe app.</p>
+<div class="hero-box mb-4">
+    <h1 class="mb-2">Welcome to Viens Manger</h1>
+    <p class="text-muted mb-0">
+        Discover recipes, save your favorites, and upload your own with pictures.
+    </p>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">My Recipes</h2>
+    <a href="{% url 'add_recipe' %}" class="btn btn-primary">Add New Recipe</a>
+</div>
+
+{% if recipes %}
+    <div class="row">
+        {% for recipe in recipes %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card recipe-card h-100 shadow-sm">
+                    {% if recipe.image %}
+                        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/600x400?text=No+Image" class="card-img-top" alt="No image">
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <p class="card-text">{{ recipe.description }}</p>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'delete_recipe' recipe.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        No recipes added yet.
+    </div>
+{% endif %}
 {% endblock %}
