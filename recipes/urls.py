@@ -11,4 +11,5 @@ urlpatterns = [
     path("breakfast/", views.breakfast, name="breakfast"),
     path("lunch/", views.lunch, name="lunch"),
     path("dinner/", views.dinner, name="dinner"),
+    path("allow-comment/", views.allow_comment, name="allow_comment"),
 ]

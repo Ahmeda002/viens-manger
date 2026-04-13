@@ -36,8 +36,11 @@ def edit_recipe(request, recipe_id):
 
 
 def delete_recipe(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    recipe.delete()
+    if request.method == 'POST':
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        if recipe.image:
+            recipe.image.delete(save=False)
+        recipe.delete()
     return redirect('recipes')
 
 
@@ -57,25 +60,27 @@ def save_api_recipe(request):
     return redirect('recipes')
 
 
-def breakfast(request):
-    url = "https://www.themealdb.com/api/json/v1/1/filter.php?c=Breakfast"
+def _fetch_meals(category):
+    url = f"https://www.themealdb.com/api/json/v1/1/filter.php?c={category}"
     response = requests.get(url)
-    data = response.json()
-    meals = data.get('meals', [])
-    return render(request, 'recipes/breakfast.html', {'meals': meals})
+    return response.json().get('meals', [])
+
+
+def breakfast(request):
+    return render(request, 'recipes/breakfast.html', {'meals': _fetch_meals('Breakfast')})
 
 
 def lunch(request):
-    url = "https://www.themealdb.com/api/json/v1/1/filter.php?c=Chicken"
-    response = requests.get(url)
-    data = response.json()
-    meals = data.get('meals', [])
-    return render(request, 'recipes/lunch.html', {'meals': meals})
+    return render(request, 'recipes/lunch.html', {'meals': _fetch_meals('Chicken')})
 
 
 def dinner(request):
-    url = "https://www.themealdb.com/api/json/v1/1/filter.php?c=Beef"
-    response = requests.get(url)
-    data = response.json()
-    meals = data.get('meals', [])
-    return render(request, 'recipes/dinner.html', {'meals': meals})
+    return render(request, 'recipes/dinner.html', {'meals': _fetch_meals('Beef')})
+
+def allow_comment(request):
+    if request.method == 'POST':
+        comment = request.POST.get('comment')
+        # Here you would typically save the comment to the database
+        # For this example, we'll just print it to the console
+        print(f"Received comment: {comment}")
+    return redirect('home')
