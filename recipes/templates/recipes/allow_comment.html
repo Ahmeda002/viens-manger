@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Leave a Comment</h2>
+    <h1 class="mb-4">We value your feedback!</h1>
+    <form method="POST" action="{% url 'allow_comment' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="comment" class="form-label">Your Comment</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+</div>
+{% endblock %}
