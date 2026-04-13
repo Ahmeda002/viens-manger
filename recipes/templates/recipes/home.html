@@ -10,8 +10,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">My Recipes</h2>
-    <a href="{% url 'add_recipe' %}" class="btn btn-primary">Add New Recipe</a>
-    <a href="{% url 'home' %}" class="btn btn-secondary">comment</a>
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'add_recipe' %}" class="btn btn-primary">Add New Recipe</a>
+    {% endif %}
 </div>
 
 {% if recipes %}
@@ -30,15 +31,49 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ recipe.title }}</h5>
                         <p class="card-text">{{ recipe.description }}</p>
+
+                        {% if recipe.ingredients or recipe.instructions %}
+                            <a class="btn btn-link btn-sm p-0 text-decoration-none" data-bs-toggle="collapse" href="#details-{{ forloop.counter }}">
+                                Show details
+                            </a>
+                            <div class="collapse mt-2" id="details-{{ forloop.counter }}">
+                                {% if recipe.ingredients %}
+                                    <p class="fw-semibold mb-1">Ingredients</p>
+                                    <ul class="small mb-2">
+                                        {% for line in recipe.ingredients.splitlines %}
+                                            {% if line %}<li>{{ line }}</li>{% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% if recipe.instructions %}
+                                    <p class="fw-semibold mb-1">Instructions</p>
+                                    <p class="small" style="white-space: pre-line;">{{ recipe.instructions|truncatewords:60 }}</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     </div>
 
-                    <div class="card-footer d-flex justify-content-between">
-                        <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="{% url 'allow_comment' %}" class="btn btn-sm btn-info">comment</a>
-                        <form method="POST" action="{% url 'delete_recipe' recipe.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        {% if request.user == recipe.user %}
+                            <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+
+                        {% if request.user.is_authenticated %}
+                            <a href="{% url 'allow_comment' recipe.id %}" class="btn btn-sm btn-info">Comment</a>
+                        {% else %}
+                            <a href="{% url 'login' %}?next={% url 'allow_comment' recipe.id %}" class="btn btn-sm btn-outline-secondary">Login to comment</a>
+                        {% endif %}
+
+                        {% if request.user == recipe.user %}
+                            <form method="POST" action="{% url 'delete_recipe' recipe.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
