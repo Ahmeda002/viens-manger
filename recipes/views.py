@@ -151,9 +151,11 @@ def allow_comment(request, recipe_id):
     if request.method == 'POST':
         if not request.user.is_authenticated:
             return redirect(f"/accounts/login/?next=/comment/{recipe_id}/")
+        
         text = request.POST.get('comment', '').strip()
-        if text:
-            Comment.objects.create(recipe=recipe, user=request.user, text=text)
+        image = request.FILES.get('image')
+        if text or image:
+            Comment.objects.create(recipe=recipe, user=request.user, text=text, image=image)
         return redirect('allow_comment', recipe_id=recipe_id)
 
     recipe_comments = list(recipe.comments.all())

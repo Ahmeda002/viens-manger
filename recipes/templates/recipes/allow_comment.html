@@ -16,6 +16,12 @@
                             <label for="comment" class="form-label fw-semibold">Your Comment</label>
                             <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
                         </div>
+
+                        <div class="mb-3" >
+                            <label for="image" class="form-label fw semibold" > Add Image (optional)</label>
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                        </div>
+                        
                         <button type="submit" class="btn btn-primary">Submit Comment</button>
                         <a href="{% url 'home' %}" class="btn btn-secondary">Back to Recipes</a>
                     </form>
