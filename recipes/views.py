@@ -1,10 +1,13 @@
 import requests
+import random
 from itertools import chain
 from operator import attrgetter
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+
 from .models import Recipe, Comment, MealComment
 from .forms import RecipeForm
 
@@ -26,6 +29,7 @@ def register(request):
             return redirect('home')
     else:
         form = UserCreationForm()
+
     return render(request, 'registration/register.html', {'form': form})
 
 
@@ -37,23 +41,29 @@ def add_recipe(request):
             recipe = form.save(commit=False)
             recipe.user = request.user
             recipe.save()
-            return redirect('recipes')
+            return redirect('home')
     else:
         form = RecipeForm()
+
     return render(request, 'recipes/add_recipe.html', {'form': form})
 
 
 @login_required
 def edit_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
+
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
         if form.is_valid():
             form.save()
-            return redirect('recipes')
+            return redirect('home')
     else:
         form = RecipeForm(instance=recipe)
-    return render(request, 'recipes/edit_recipe.html', {'form': form, 'recipe': recipe})
+
+    return render(request, 'recipes/edit_recipe.html', {
+        'form': form,
+        'recipe': recipe
+    })
 
 
 @login_required
@@ -61,12 +71,16 @@ def delete_recipe(request, recipe_id):
     if request.method == 'POST':
         recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
         next_url = request.POST.get('next', '')
+
         if recipe.image:
             recipe.image.delete(save=False)
+
         recipe.delete()
+
         if next_url:
             return redirect(next_url)
-    return redirect('recipes')
+
+    return redirect('home')
 
 
 @login_required
@@ -77,7 +91,6 @@ def save_api_recipe(request):
         image_url = request.POST.get('image_url')
         ingredients = request.POST.get('ingredients', '')
         instructions = request.POST.get('instructions', '')
-
         meal_id = request.POST.get('meal_id', '')
 
         if title and description:
@@ -91,27 +104,35 @@ def save_api_recipe(request):
                 meal_id=meal_id,
             )
 
-    return redirect('recipes')
+    return redirect('home')
 
 
 def meal_detail(request, meal_id):
     url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={meal_id}"
     response = requests.get(url)
     data = response.json().get('meals') or []
+
     if not data:
         return redirect('home')
+
     meal = data[0]
 
     if request.method == 'POST' and request.user.is_authenticated:
         text = request.POST.get('comment', '').strip()
         if text:
-            MealComment.objects.create(meal_id=meal_id, user=request.user, text=text)
+            MealComment.objects.create(
+                meal_id=meal_id,
+                user=request.user,
+                text=text
+            )
         return redirect('meal_detail', meal_id=meal_id)
 
     ingredients = []
+
     for i in range(1, 21):
         ingredient = (meal.get(f'strIngredient{i}') or '').strip()
         measure = (meal.get(f'strMeasure{i}') or '').strip()
+
         if ingredient:
             ingredients.append(f"{measure} {ingredient}".strip())
 
@@ -119,7 +140,10 @@ def meal_detail(request, meal_id):
 
     saved_recipe = None
     if request.user.is_authenticated:
-        saved_recipe = Recipe.objects.filter(user=request.user, meal_id=meal_id).first()
+        saved_recipe = Recipe.objects.filter(
+            user=request.user,
+            meal_id=meal_id
+        ).first()
 
     return render(request, 'recipes/meal_detail.html', {
         'meal': meal,
@@ -133,19 +157,34 @@ def meal_detail(request, meal_id):
 def _fetch_meals(category):
     url = f"https://www.themealdb.com/api/json/v1/1/filter.php?c={category}"
     response = requests.get(url)
-    return response.json().get('meals', [])
+    return response.json().get('meals', []) or []
 
 
 def breakfast(request):
-    return render(request, 'recipes/breakfast.html', {'meals': _fetch_meals('Breakfast')})
+    meals = _fetch_meals('Breakfast')
+    return render(request, 'recipes/breakfast.html', {'meals': meals})
 
 
 def lunch(request):
-    return render(request, 'recipes/lunch.html', {'meals': _fetch_meals('Chicken')})
+    meals = _fetch_meals('Chicken')
+    return render(request, 'recipes/lunch.html', {'meals': meals})
 
 
 def dinner(request):
-    return render(request, 'recipes/dinner.html', {'meals': _fetch_meals('Beef')})
+    meals = _fetch_meals('Beef')
+    return render(request, 'recipes/dinner.html', {'meals': meals})
+
+
+def today_special(request):
+    url = "https://www.themealdb.com/api/json/v1/1/search.php?s="
+    response = requests.get(url)
+    meals = response.json().get('meals', []) or []
+
+    specials = random.sample(meals, min(len(meals), 6))
+
+    return render(request, 'recipes/today_special.html', {
+        'meals': specials
+    })
 
 
 def allow_comment(request, recipe_id):
@@ -154,13 +193,31 @@ def allow_comment(request, recipe_id):
     if request.method == 'POST':
         if not request.user.is_authenticated:
             return redirect(f"/accounts/login/?next=/comment/{recipe_id}/")
+
         text = request.POST.get('comment', '').strip()
+
         if text:
-            Comment.objects.create(recipe=recipe, user=request.user, text=text)
+            Comment.objects.create(
+                recipe=recipe,
+                user=request.user,
+                text=text
+            )
+
         return redirect('allow_comment', recipe_id=recipe_id)
 
     recipe_comments = list(recipe.comments.all())
-    meal_comments = list(MealComment.objects.filter(meal_id=recipe.meal_id)) if recipe.meal_id else []
-    comments = sorted(chain(recipe_comments, meal_comments), key=attrgetter('created_at'), reverse=True)
 
-    return render(request, 'recipes/allow_comment.html', {'recipe': recipe, 'comments': comments})
+    meal_comments = []
+    if recipe.meal_id:
+        meal_comments = list(MealComment.objects.filter(meal_id=recipe.meal_id))
+
+    comments = sorted(
+        chain(recipe_comments, meal_comments),
+        key=attrgetter('created_at'),
+        reverse=True
+    )
+
+    return render(request, 'recipes/allow_comment.html', {
+        'recipe': recipe,
+        'comments': comments
+    })
