@@ -10,7 +10,10 @@ from .forms import RecipeForm
 
 
 def home(request):
-    recipes = Recipe.objects.all().order_by('-created_at')
+    if request.user.is_authenticated:
+        recipes = Recipe.objects.filter(user=request.user).order_by('-created_at')
+    else:
+        recipes = []
     return render(request, 'recipes/home.html', {'recipes': recipes})
 
 
