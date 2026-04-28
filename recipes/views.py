@@ -176,14 +176,39 @@ def dinner(request):
 
 
 def today_special(request):
-    url = "https://www.themealdb.com/api/json/v1/1/search.php?s="
-    response = requests.get(url)
-    meals = response.json().get('meals', []) or []
+    import datetime as dt
+    now = dt.datetime.now().astimezone()
+    hour = now.hour
 
-    specials = random.sample(meals, min(len(meals), 6))
+    if 6 <= hour < 11:
+        period = 'breakfast'
+        category = 'Breakfast'
+        period_label = 'Breakfast'
+        next_period = 'Lunch at 11:00 AM'
+    elif 11 <= hour < 17:
+        period = 'lunch'
+        category = 'Chicken'
+        period_label = 'Lunch'
+        next_period = 'Dinner at 5:00 PM'
+    else:
+        period = 'dinner'
+        category = 'Beef'
+        period_label = 'Dinner'
+        next_period = 'Breakfast tomorrow at 6:00 AM'
+
+    meals = _fetch_meals(category)
+
+    meal = None
+    if meals:
+        seed = f"{now.date()}-{period}"
+        random.seed(seed)
+        meal = random.choice(meals)
+        random.seed()
 
     return render(request, 'recipes/today_special.html', {
-        'meals': specials
+        'meal': meal,
+        'period_label': period_label,
+        'next_period': next_period,
     })
 
 
