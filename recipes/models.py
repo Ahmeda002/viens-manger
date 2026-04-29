@@ -29,8 +29,8 @@ class Recipe(models.Model):
 class Comment(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
-    text = models.TextField()
-    image = models.ImageField(upload_to='comment_images/', null=True)
+    text = models.TextField(blank=True)
+    image = models.ImageField(upload_to='comment_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

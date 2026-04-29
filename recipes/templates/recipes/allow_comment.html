@@ -10,15 +10,15 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 {% if request.user.is_authenticated %}
-                    <form method="POST" action="{% url 'allow_comment' recipe.id %}">
+                    <form method="POST" action="{% url 'allow_comment' recipe.id %}" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="comment" class="form-label fw-semibold">Your Comment</label>
-                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
                         </div>
 
-                        <div class="mb-3" >
-                            <label for="image" class="form-label fw semibold" > Add Image (optional)</label>
+                        <div class="mb-3">
+                            <label for="image" class="form-label fw-semibold">Add Image (optional)</label>
                             <input class="form-control" type="file" id="image" name="image" accept="image/*">
                         </div>
                         
@@ -37,7 +37,10 @@
             {% for comment in comments %}
                 <div class="card mb-3 shadow-sm">
                     <div class="card-body">
-                        <p class="mb-1">{{ comment.text }}</p>
+                        {% if comment.text %}<p class="mb-1">{{ comment.text }}</p>{% endif %}
+                        {% if comment.image %}
+                            <img src="{{ comment.image.url }}" class="img-fluid rounded mb-2" alt="comment image">
+                        {% endif %}
                         <small class="text-muted">
                             {% if comment.user %}{{ comment.user.username }} &mdash; {% endif %}
                             {{ comment.created_at|date:"N j, Y \a\t g:i A" }}
