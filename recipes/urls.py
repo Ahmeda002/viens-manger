@@ -14,4 +14,5 @@ urlpatterns = [
     path("lunch/", views.lunch, name="lunch"),
     path("dinner/", views.dinner, name="dinner"),
     path("comment/<int:recipe_id>/", views.allow_comment, name="allow_comment"),
+    path("today-special/", views.today_special, name="today_special"),
 ]

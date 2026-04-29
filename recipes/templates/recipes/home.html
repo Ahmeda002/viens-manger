@@ -16,7 +16,11 @@
 </div>
 
 
-{% if recipes %}
+{% if not request.user.is_authenticated %}
+    <div class="alert alert-info">
+        <a href="{% url 'login' %}">Login</a> or <a href="{% url 'register' %}">register</a> to see and manage your recipes.
+    </div>
+{% elif recipes %}
     <div class="row">
         {% for recipe in recipes %}
             <div class="col-md-6 col-lg-4 mb-4">
@@ -82,7 +86,7 @@
     </div>
 {% else %}
     <div class="alert alert-info">
-        No recipes added yet.
+        No recipes added yet. <a href="{% url 'add_recipe' %}">Add your first one!</a>
     </div>
 {% endif %}
 {% endblock %}
