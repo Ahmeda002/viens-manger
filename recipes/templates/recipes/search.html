@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-box mb-4">
+    <h1 class="mb-2">Search Results</h1>
+    {% if query %}
+        <p class="text-muted mb-0">Results for "<strong>{{ query }}</strong>"</p>
+    {% else %}
+        <p class="text-muted mb-0">Enter a search term above to find recipes.</p>
+    {% endif %}
+</div>
+
+{% if query %}
+
+    <h4 class="mb-3">My Saved Recipes</h4>
+    {% if saved_results %}
+        <div class="row mb-5">
+            {% for recipe in saved_results %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card recipe-card h-100 shadow-sm">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                        {% elif recipe.image_url %}
+                            <img src="{{ recipe.image_url }}" class="card-img-top" alt="{{ recipe.title }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/600x400?text=No+Image" class="card-img-top" alt="No image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ recipe.title }}</h5>
+                            <p class="card-text">{{ recipe.description }}</p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a href="{% url 'allow_comment' recipe.id %}" class="btn btn-sm btn-info">View</a>
+                            {% if request.user == recipe.user %}
+                                <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-sm btn-warning">Edit</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted mb-5">No saved recipes matched "{{ query }}".</p>
+    {% endif %}
+
+    <h4 class="mb-3">Meals from MealDB</h4>
+    {% if api_results %}
+        <div class="row">
+            {% for meal in api_results %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card recipe-card h-100 shadow-sm">
+                        <img src="{{ meal.strMealThumb }}" class="card-img-top" alt="{{ meal.strMeal }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ meal.strMeal }}</h5>
+                            <p class="text-muted small mb-0">{{ meal.strCategory }} &mdash; {{ meal.strArea }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'meal_detail' meal.idMeal %}" class="btn btn-sm btn-primary">View Recipe</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No meals found on MealDB for "{{ query }}".</p>
+    {% endif %}
+
+{% endif %}
+{% endblock %}

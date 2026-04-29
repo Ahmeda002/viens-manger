@@ -83,9 +83,6 @@
 
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
-                    </li>
 
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'today_special' %}">Today's Special</a>
@@ -102,6 +99,11 @@
                         </ul>
                     </li>
                 </ul>
+
+                <form class="d-flex me-2" method="GET" action="{% url 'search' %}">
+                    <input class="form-control form-control-sm me-1" type="search" name="q" placeholder="Search recipes..." value="{{ request.GET.q }}">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
+                </form>
 
                 <div class="d-flex align-items-center gap-2">
                     {% if request.user.is_authenticated %}

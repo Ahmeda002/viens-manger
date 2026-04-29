@@ -3,6 +3,7 @@ import random
 from itertools import chain
 from operator import attrgetter
 
+from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -244,6 +245,34 @@ def profile(request):
         'avatar_form': avatar_form,
         'email_form': email_form,
         'user_profile': user_profile,
+    })
+
+
+def search(request):
+    query = request.GET.get('q', '').strip()
+    saved_results = []
+    api_results = []
+
+    if query:
+        saved_results = list(Recipe.objects.filter(
+            models.Q(title__icontains=query) |
+            models.Q(description__icontains=query) |
+            models.Q(ingredients__icontains=query)
+        ).order_by('-created_at'))
+
+        try:
+            response = requests.get(
+                f"https://www.themealdb.com/api/json/v1/1/search.php?s={query}",
+                timeout=5
+            )
+            api_results = response.json().get('meals') or []
+        except requests.RequestException:
+            api_results = []
+
+    return render(request, 'recipes/search.html', {
+        'query': query,
+        'saved_results': saved_results,
+        'api_results': api_results,
     })
 
 
