@@ -1,24 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row">
+<div class="row mb-5">
     <div class="col-md-5 mb-4">
-        <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="img-fluid rounded shadow-sm">
+        <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="img-fluid" style="width:100%; max-height:400px; object-fit:cover; border:3px solid #1a1a1a; box-shadow:6px 6px 0 #1a1a1a;">
     </div>
 
     <div class="col-md-7">
-        <h2 class="mb-1">{{ meal.strMeal }}</h2>
-        <p class="text-muted mb-3">{{ meal.strCategory }} &mdash; {{ meal.strArea }}</p>
+        <p class="mb-1 fw-bold" style="font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; color:#FF3A20;">
+            {{ meal.strCategory }} &mdash; {{ meal.strArea }}
+        </p>
+        <h2 class="mb-3">{{ meal.strMeal }}</h2>
 
         {% if request.user.is_authenticated %}
             {% if saved_recipe %}
-                <form method="POST" action="{% url 'delete_recipe' saved_recipe.id %}">
+                <form method="POST" action="{% url 'delete_recipe' saved_recipe.id %}" class="mb-4">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ request.path }}">
-                    <button type="submit" class="btn btn-outline-danger mb-4">Remove from My Recipes</button>
+                    <button type="submit" class="btn btn-outline-danger">Remove from My Recipes</button>
                 </form>
             {% else %}
-                <form method="POST" action="{% url 'save_api_recipe' %}">
+                <form method="POST" action="{% url 'save_api_recipe' %}" class="mb-4">
                     {% csrf_token %}
                     <input type="hidden" name="title" value="{{ meal.strMeal }}">
                     <input type="hidden" name="description" value="{{ meal.strCategory }} — {{ meal.strArea }}">
@@ -26,15 +28,15 @@
                     <input type="hidden" name="ingredients" value="{{ ingredients_text }}">
                     <input type="hidden" name="instructions" value="{{ meal.strInstructions }}">
                     <input type="hidden" name="meal_id" value="{{ meal.idMeal }}">
-                    <button type="submit" class="btn btn-success mb-4">Save to My Recipes</button>
+                    <button type="submit" class="btn btn-success">+ Save to My Recipes</button>
                 </form>
             {% endif %}
         {% else %}
             <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-secondary mb-4">Login to save this recipe</a>
         {% endif %}
 
-        <h5>Ingredients</h5>
-        <ul class="mb-4">
+        <h5 class="section-heading">Ingredients</h5>
+        <ul class="mb-0" style="line-height:2;">
             {% for ingredient in ingredients %}
                 <li>{{ ingredient }}</li>
             {% endfor %}
@@ -42,20 +44,20 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row mb-4">
     <div class="col-12">
-        <h5>Instructions</h5>
-        <p style="white-space: pre-line;">{{ meal.strInstructions }}</p>
+        <h5 class="section-heading">Instructions</h5>
+        <p style="white-space:pre-line; line-height:1.8;">{{ meal.strInstructions }}</p>
     </div>
 </div>
 
-<a href="javascript:history.back()" class="btn btn-secondary mt-3">Back</a>
+<a href="javascript:history.back()" class="btn btn-secondary mb-5">&#8592; Back</a>
 
-<hr class="my-4">
+<hr>
 
-<div class="row">
+<div class="row mt-4">
     <div class="col-md-8">
-        <h5 class="mb-3">Comments</h5>
+        <h5 class="section-heading mb-4">Comments</h5>
 
         {% if request.user.is_authenticated %}
             <form method="POST" action="{% url 'meal_detail' meal.idMeal %}" class="mb-4">
@@ -66,14 +68,14 @@
                 <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
             </form>
         {% else %}
-            <p class="text-muted mb-4">
+            <p class="mb-4">
                 <a href="{% url 'login' %}?next={{ request.path }}">Login</a> to leave a comment.
             </p>
         {% endif %}
 
         {% if comments %}
             {% for comment in comments %}
-                <div class="card mb-3 shadow-sm">
+                <div class="food-card mb-3">
                     <div class="card-body">
                         <p class="mb-1">{{ comment.text }}</p>
                         <small class="text-muted">

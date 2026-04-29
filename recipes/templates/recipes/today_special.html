@@ -1,28 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="hero-box mb-4">
-    <h1 class="mb-2">Today's Special</h1>
-    <p class="text-muted mb-0">One meal picked for {{ period_label }} — changes when the next period starts.</p>
+<div class="page-header mb-5">
+    <h1>Today's Special</h1>
+    <p>One meal picked for {{ period_label }} — changes when the next period starts.</p>
 </div>
 
 {% if meal %}
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <img src="{{ meal.strMealThumb }}" class="card-img-top" alt="{{ meal.strMeal }}">
-                <div class="card-body text-center">
-                    <span class="badge bg-secondary mb-2">{{ period_label }}</span>
-                    <h4 class="card-title">{{ meal.strMeal }}</h4>
+        <div class="col-md-6 col-lg-5">
+            <div class="food-card">
+                <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" style="height:280px;">
+                <div class="card-body text-center py-4">
+                    <span class="badge mb-3 px-3 py-2" style="background-color:#FFD600; color:#1a1a1a; font-family:'Oswald',sans-serif; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; border:2px solid #1a1a1a;">
+                        {{ period_label }}
+                    </span>
+                    <h3>{{ meal.strMeal }}</h3>
                 </div>
-                <div class="card-footer text-center">
-                    <a href="{% url 'meal_detail' meal.idMeal %}" class="btn btn-primary">View Recipe</a>
+                <div class="card-footer text-center py-3">
+                    <a href="{% url 'meal_detail' meal.idMeal %}" class="btn btn-primary px-4">View Full Recipe</a>
                 </div>
             </div>
-            <p class="text-muted text-center mt-3 small">Next up: {{ next_period }}</p>
+            <p class="text-center mt-3 text-muted">Next up: {{ next_period }}</p>
         </div>
     </div>
 {% else %}
-    <div class="alert alert-info">No special available right now.</div>
+    <div class="alert alert-info text-center">No special available right now. Check back soon!</div>
 {% endif %}
 {% endblock %}

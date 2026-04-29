@@ -166,7 +166,7 @@ def breakfast(request):
 
 
 def lunch(request):
-    meals = _fetch_meals('Chicken')
+    meals = _fetch_meals('Seafood')
     return render(request, 'recipes/lunch.html', {'meals': meals})
 
 

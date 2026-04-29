@@ -2,44 +2,51 @@
 {% load static %}
 
 {% block content %}
-<div class="hero-box mb-4">
+<div class="hero-box mb-5">
     <h1 class="mb-2">Welcome to Viens Manger</h1>
-    <p class="text-muted mb-0">
-        Discover recipes, save your favorites, and upload your own with pictures.
+    <p class="mb-3" style="font-size:1.05rem;">
+        Discover recipes, save your favorites, and share your own creations.
     </p>
+    {% if not request.user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-primary me-2">Get Started</a>
+        <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+    {% else %}
+        <a href="{% url 'add_recipe' %}" class="btn btn-primary me-2">+ Add Recipe</a>
+        <a href="{% url 'today_special' %}" class="btn btn-secondary">Today's Special</a>
+    {% endif %}
 </div>
 
-<h2 class="mb-3">Browse by Category</h2>
+<h2 class="section-heading mb-4">Browse by Category</h2>
 <div class="row mb-5">
     <div class="col-md-4 mb-3">
         <a href="{% url 'breakfast' %}" class="text-decoration-none">
-            <div class="card h-100 shadow-sm text-center category-card">
-                <img src="https://www.themealdb.com/images/category/breakfast.png" class="card-img-top p-3" alt="Breakfast" style="height: 180px; object-fit: contain;">
+            <div class="card category-card h-100 shadow-sm text-center">
+                <img src="https://www.themealdb.com/images/category/breakfast.png" class="card-img-top p-3" alt="Breakfast" style="height:180px; object-fit:contain;">
                 <div class="card-body">
                     <h4 class="card-title">Breakfast</h4>
-                    <p class="card-text text-muted">Start your day right with morning meals.</p>
+                    <p class="card-text">Start your day with morning meals.</p>
                 </div>
             </div>
         </a>
     </div>
     <div class="col-md-4 mb-3">
         <a href="{% url 'lunch' %}" class="text-decoration-none">
-            <div class="card h-100 shadow-sm text-center category-card">
-                <img src="https://www.themealdb.com/images/category/chicken.png" class="card-img-top p-3" alt="Lunch" style="height: 180px; object-fit: contain;">
+            <div class="card category-card h-100 shadow-sm text-center">
+                <img src="https://www.themealdb.com/images/category/seafood.png" class="card-img-top p-3" alt="Lunch" style="height:180px; object-fit:contain;">
                 <div class="card-body">
                     <h4 class="card-title">Lunch</h4>
-                    <p class="card-text text-muted">Chicken dishes to fuel your afternoon.</p>
+                    <p class="card-text">Fresh seafood dishes to fuel your afternoon.</p>
                 </div>
             </div>
         </a>
     </div>
     <div class="col-md-4 mb-3">
         <a href="{% url 'dinner' %}" class="text-decoration-none">
-            <div class="card h-100 shadow-sm text-center category-card">
-                <img src="https://www.themealdb.com/images/category/beef.png" class="card-img-top p-3" alt="Dinner" style="height: 180px; object-fit: contain;">
+            <div class="card category-card h-100 shadow-sm text-center">
+                <img src="https://www.themealdb.com/images/category/beef.png" class="card-img-top p-3" alt="Dinner" style="height:180px; object-fit:contain;">
                 <div class="card-body">
                     <h4 class="card-title">Dinner</h4>
-                    <p class="card-text text-muted">Hearty beef meals for the evening.</p>
+                    <p class="card-text">Hearty beef meals for the evening.</p>
                 </div>
             </div>
         </a>
@@ -47,12 +54,11 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">My Recipes</h2>
+    <h2 class="section-heading mb-0">My Recipes</h2>
     {% if request.user.is_authenticated %}
-        <a href="{% url 'add_recipe' %}" class="btn btn-primary">Add New Recipe</a>
+        <a href="{% url 'add_recipe' %}" class="btn btn-primary">+ Add New Recipe</a>
     {% endif %}
 </div>
-
 
 {% if not request.user.is_authenticated %}
     <div class="alert alert-info">
@@ -62,26 +68,28 @@
     <div class="row">
         {% for recipe in recipes %}
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card recipe-card h-100 shadow-sm">
+                <div class="food-card h-100">
                     {% if recipe.image %}
-                        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
                     {% elif recipe.image_url %}
-                        <img src="{{ recipe.image_url }}" class="card-img-top" alt="{{ recipe.title }}">
+                        <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}">
                     {% else %}
-                        <img src="{% static 'images/no_image.svg' %}" class="card-img-top" alt="No image">
+                        <img src="https://via.placeholder.com/600x400?text=No+Image" alt="No image">
                     {% endif %}
 
                     <div class="card-body">
-                        <h5 class="card-title"><a href="{% url 'recipe_detail' recipe.id %}" class="text-decoration-none text-dark">{{ recipe.title }}</a></h5>
+                        <h5 class="card-title">
+                            <a href="{% url 'recipe_detail' recipe.id %}" class="text-decoration-none text-dark">{{ recipe.title }}</a>
+                        </h5>
                         <p class="card-text">{{ recipe.description }}</p>
 
                         {% if recipe.ingredients or recipe.instructions %}
-                            <a class="btn btn-link btn-sm p-0 text-decoration-none" data-bs-toggle="collapse" href="#details-{{ forloop.counter }}">
-                                Show details
+                            <a class="small text-decoration-none fw-bold" style="cursor:pointer;" data-bs-toggle="collapse" href="#details-{{ forloop.counter }}">
+                                Show details ▾
                             </a>
                             <div class="collapse mt-2" id="details-{{ forloop.counter }}">
                                 {% if recipe.ingredients %}
-                                    <p class="fw-semibold mb-1">Ingredients</p>
+                                    <p class="fw-semibold mb-1 small">Ingredients</p>
                                     <ul class="small mb-2">
                                         {% for line in recipe.ingredients.splitlines %}
                                             {% if line %}<li>{{ line }}</li>{% endif %}
@@ -89,8 +97,8 @@
                                     </ul>
                                 {% endif %}
                                 {% if recipe.instructions %}
-                                    <p class="fw-semibold mb-1">Instructions</p>
-                                    <p class="small" style="white-space: pre-line;">{{ recipe.instructions|truncatewords:60 }}</p>
+                                    <p class="fw-semibold mb-1 small">Instructions</p>
+                                    <p class="small" style="white-space:pre-line;">{{ recipe.instructions|truncatewords:60 }}</p>
                                 {% endif %}
                             </div>
                         {% endif %}
@@ -103,11 +111,7 @@
                             <span></span>
                         {% endif %}
 
-                        {% if request.user.is_authenticated %}
-                            <a href="{% url 'allow_comment' recipe.id %}" class="btn btn-sm btn-info">Comment</a>
-                        {% else %}
-                            <a href="{% url 'login' %}?next={% url 'allow_comment' recipe.id %}" class="btn btn-sm btn-outline-secondary">Login to comment</a>
-                        {% endif %}
+                        <a href="{% url 'allow_comment' recipe.id %}" class="btn btn-sm btn-info">Comments</a>
 
                         {% if request.user == recipe.user %}
                             <form method="POST" action="{% url 'delete_recipe' recipe.id %}" class="d-inline">
@@ -124,7 +128,7 @@
     </div>
 {% else %}
     <div class="alert alert-info">
-        No recipes added yet. <a href="{% url 'add_recipe' %}">Add your first one!</a>
+        No recipes yet. <a href="{% url 'add_recipe' %}" class="fw-bold text-dark">Add your first one!</a>
     </div>
 {% endif %}
 {% endblock %}

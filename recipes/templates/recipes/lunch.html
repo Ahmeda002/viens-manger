@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="mb-4">Lunch Recipes</h1>
+<div class="page-header mb-4">
+    <h1>Lunch</h1>
+    <p>Fresh seafood dishes to fuel your afternoon.</p>
+</div>
 
 <div class="row">
     {% for meal in meals %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ meal.strMealThumb }}" class="card-img-top" alt="{{ meal.strMeal }}">
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="food-card h-100">
+                <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ meal.strMeal }}</h5>
                 </div>
