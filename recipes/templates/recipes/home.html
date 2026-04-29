@@ -4,8 +4,13 @@
 {% block content %}
 <div class="hero-box mb-5">
     <h1 class="mb-2">Welcome to Viens Manger</h1>
+<<<<<<< HEAD
     <p class="mb-3" style="font-size:1.05rem;">
         Discover recipes, save your favorites, and share your own creations.
+=======
+    <p class="text-muted mb-0">
+        Discover recipes from TheMealDB, save your favorites,also comment to express how u are feeling about each recipe, and upload your own with pictures.All in one place for food lovers! Browse by category, explore today's special, and share your culinary creations with the community.
+>>>>>>> lee-branch
     </p>
     {% if not request.user.is_authenticated %}
         <a href="{% url 'register' %}" class="btn btn-primary me-2">Get Started</a>
