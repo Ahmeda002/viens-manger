@@ -6,10 +6,8 @@ from operator import attrgetter
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-
-from .models import Recipe, Comment, MealComment
-from .forms import RecipeForm
+from .models import Recipe, Comment, MealComment, UserProfile
+from .forms import RecipeForm, RegisterForm, AvatarForm, EmailForm
 
 
 def home(request):
@@ -22,13 +20,14 @@ def home(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            UserProfile.objects.create(user=user)
             login(request, user)
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = RegisterForm()
 
     return render(request, 'registration/register.html', {'form': form})
 
@@ -209,6 +208,42 @@ def today_special(request):
         'meal': meal,
         'period_label': period_label,
         'next_period': next_period,
+    })
+
+
+def recipe_detail(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    ingredients = [line for line in recipe.ingredients.splitlines() if line.strip()] if recipe.ingredients else []
+    return render(request, 'recipes/recipe_detail.html', {
+        'recipe': recipe,
+        'ingredients': ingredients,
+    })
+
+
+@login_required
+def profile(request):
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    recipes = Recipe.objects.filter(user=request.user).order_by('-created_at')
+    avatar_form = AvatarForm(instance=user_profile)
+    email_form = EmailForm(instance=request.user)
+
+    if request.method == 'POST':
+        if 'update_avatar' in request.POST:
+            avatar_form = AvatarForm(request.POST, request.FILES, instance=user_profile)
+            if avatar_form.is_valid():
+                avatar_form.save()
+                return redirect('profile')
+        elif 'update_email' in request.POST:
+            email_form = EmailForm(request.POST, instance=request.user)
+            if email_form.is_valid():
+                email_form.save()
+                return redirect('profile')
+
+    return render(request, 'recipes/profile.html', {
+        'recipes': recipes,
+        'avatar_form': avatar_form,
+        'email_form': email_form,
+        'user_profile': user_profile,
     })
 
 

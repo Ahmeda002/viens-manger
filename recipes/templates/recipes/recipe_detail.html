@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5 mb-4">
+        {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="img-fluid rounded shadow-sm">
+        {% elif recipe.image_url %}
+            <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="img-fluid rounded shadow-sm">
+        {% else %}
+            <img src="{% static 'images/no_image.svg' %}" alt="No image" class="img-fluid rounded shadow-sm">
+        {% endif %}
+    </div>
+
+    <div class="col-md-7">
+        <h2 class="mb-1">{{ recipe.title }}</h2>
+        <p class="text-muted mb-3">Added {{ recipe.created_at|date:"F j, Y" }}</p>
+        <p class="mb-4">{{ recipe.description }}</p>
+
+        {% if ingredients %}
+            <h5>Ingredients</h5>
+            <ul class="mb-4">
+                {% for ingredient in ingredients %}
+                    <li>{{ ingredient }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if request.user == recipe.user %}
+            <div class="d-flex gap-2">
+                <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <form method="POST" action="{% url 'delete_recipe' recipe.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'home' %}">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if recipe.instructions %}
+<div class="row mt-2">
+    <div class="col-12">
+        <h5>Instructions</h5>
+        <p style="white-space: pre-line;">{{ recipe.instructions }}</p>
+    </div>
+</div>
+{% endif %}
+
+<a href="javascript:history.back()" class="btn btn-secondary mt-3">Back</a>
+{% endblock %}

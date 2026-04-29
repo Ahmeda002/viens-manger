@@ -8,6 +8,13 @@
     <style>
         body {
             background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
         }
 
         .recipe-card img {
@@ -20,6 +27,15 @@
             border-radius: 12px;
             padding: 30px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .category-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
         }
     </style>
 </head>
@@ -42,22 +58,12 @@
                         <a class="nav-link" href="{% url 'today_special' %}">Today's Special</a>
                     </li>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Categories
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
-                            <li><a class="dropdown-item" href="{% url 'breakfast' %}">Breakfast</a></li>
-                            <li><a class="dropdown-item" href="{% url 'lunch' %}">Lunch</a></li>
-                            <li><a class="dropdown-item" href="{% url 'dinner' %}">Dinner</a></li>
-                        </ul>
-                    </li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-2">
                     {% if request.user.is_authenticated %}
                         <a class="btn btn-outline-light btn-sm" href="{% url 'add_recipe' %}">Add Recipe</a>
-                        <span class="navbar-text text-light">{{ request.user.username }}</span>
+                        <a href="{% url 'profile' %}" class="navbar-text text-light text-decoration-none">{{ request.user.username }}</a>
                         <form method="POST" action="{% url 'logout' %}" class="d-inline m-0">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
@@ -71,10 +77,45 @@
         </div>
     </nav>
 
-    <div class="container py-4">
+    <div class="main-content container py-4">
         {% block content %}
         {% endblock %}
     </div>
+
+    <footer class="bg-dark text-light mt-auto py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="fw-bold">Viens Manger</h5>
+                    <p class="text-muted small mb-0">Discover, save, and share your favourite recipes.</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h6 class="fw-semibold">Browse</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li><a href="{% url 'breakfast' %}" class="text-muted text-decoration-none">Breakfast</a></li>
+                        <li><a href="{% url 'lunch' %}" class="text-muted text-decoration-none">Lunch</a></li>
+                        <li><a href="{% url 'dinner' %}" class="text-muted text-decoration-none">Dinner</a></li>
+                        <li><a href="{% url 'today_special' %}" class="text-muted text-decoration-none">Today's Special</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="fw-semibold">Account</h6>
+                    <ul class="list-unstyled small mb-0">
+                        {% if request.user.is_authenticated %}
+                            <li><a href="{% url 'profile' %}" class="text-muted text-decoration-none">My Profile</a></li>
+                            <li><a href="{% url 'add_recipe' %}" class="text-muted text-decoration-none">Add Recipe</a></li>
+                            <li><a href="{% url 'password_change' %}" class="text-muted text-decoration-none">Change Password</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}" class="text-muted text-decoration-none">Login</a></li>
+                            <li><a href="{% url 'register' %}" class="text-muted text-decoration-none">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary mt-3 mb-2">
+            <p class="text-muted small text-center mb-0">&copy; 2026 Viens Manger. Meal data provided by <a href="https://www.themealdb.com" class="text-muted" target="_blank">TheMealDB</a>.</p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

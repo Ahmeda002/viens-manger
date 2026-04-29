@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="hero-box mb-4">
@@ -6,6 +7,43 @@
     <p class="text-muted mb-0">
         Discover recipes, save your favorites, and upload your own with pictures.
     </p>
+</div>
+
+<h2 class="mb-3">Browse by Category</h2>
+<div class="row mb-5">
+    <div class="col-md-4 mb-3">
+        <a href="{% url 'breakfast' %}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm text-center category-card">
+                <img src="https://www.themealdb.com/images/category/breakfast.png" class="card-img-top p-3" alt="Breakfast" style="height: 180px; object-fit: contain;">
+                <div class="card-body">
+                    <h4 class="card-title">Breakfast</h4>
+                    <p class="card-text text-muted">Start your day right with morning meals.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="{% url 'lunch' %}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm text-center category-card">
+                <img src="https://www.themealdb.com/images/category/chicken.png" class="card-img-top p-3" alt="Lunch" style="height: 180px; object-fit: contain;">
+                <div class="card-body">
+                    <h4 class="card-title">Lunch</h4>
+                    <p class="card-text text-muted">Chicken dishes to fuel your afternoon.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="{% url 'dinner' %}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm text-center category-card">
+                <img src="https://www.themealdb.com/images/category/beef.png" class="card-img-top p-3" alt="Dinner" style="height: 180px; object-fit: contain;">
+                <div class="card-body">
+                    <h4 class="card-title">Dinner</h4>
+                    <p class="card-text text-muted">Hearty beef meals for the evening.</p>
+                </div>
+            </div>
+        </a>
+    </div>
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -30,11 +68,11 @@
                     {% elif recipe.image_url %}
                         <img src="{{ recipe.image_url }}" class="card-img-top" alt="{{ recipe.title }}">
                     {% else %}
-                        <img src="https://via.placeholder.com/600x400?text=No+Image" class="card-img-top" alt="No image">
+                        <img src="{% static 'images/no_image.svg' %}" class="card-img-top" alt="No image">
                     {% endif %}
 
                     <div class="card-body">
-                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <h5 class="card-title"><a href="{% url 'recipe_detail' recipe.id %}" class="text-decoration-none text-dark">{{ recipe.title }}</a></h5>
                         <p class="card-text">{{ recipe.description }}</p>
 
                         {% if recipe.ingredients or recipe.instructions %}
